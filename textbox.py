@@ -16,8 +16,8 @@ window = tk.Tk()
 
 
 
-name = tk.StringVar()
-nameEntered = ttk.Entry(window, width = 15, textvariable = name)
+filename_entered = tk.StringVar()
+nameEntered = ttk.Entry(window, width = 15, textvariable = filename_ntered)
 nameEntered.grid(column = 0, row = 1)
 
 

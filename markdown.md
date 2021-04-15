@@ -1,9 +1,6 @@
 #CREDIT FOR THIS MARKDOWN FILE TO:
 #https://github.com/**emn178**/markdown/blob/master/README.md
-*
-*
-*
-*
+#
 
 # Markdown
 A markdown example shows how to write a markdown file. This document integrates core syntax and extensions (GMF).

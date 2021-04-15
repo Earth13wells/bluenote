@@ -22,6 +22,36 @@ def save(): #Save Image as filename
         filename = filename_entered.get()
     image1.save(filename)
 #
+def save_file(): #Save Image as filename
+    global mdfile
+    if mdfile_entered.get() != "":
+        mdfile = mdfile_entered.get()
+    content = text_f1.get(1.0, "end-1c")
+    try:
+        with open(mdfile,'r+') as myfile:
+            myfile.seek(0)
+            myfile.write(content)
+            myfile.truncate()
+    except FileNotFoundError:
+        with open(mdfile, 'w') as f:
+            f.write(content)
+#
+def save_html():
+    global mdfile
+    if mdfile_entered.get() != "":
+        mdfile = f"{mdfile_entered.get()}.html"
+    content = text_f1.get(1.0, "end-1c")
+    entry_content.set(markdowner.convert(content))
+    content = markdowner.convert(content)
+    try:
+        with open(mdfile,'r+') as myfile:
+            myfile.seek(0)
+            myfile.write(f'<html><body style=\"background-color:grey;\">{content}</html>')
+            myfile.truncate()
+    except FileNotFoundError:
+        with open(mdfile, 'w') as f:
+            f.write(f'<html><body style=\"background-color:grey;\">{content}</html>')
+#
 def activate_paint(e): #From sketch.py
     global lastx, lasty
     f2.bind('<B1-Motion>', paint)
@@ -61,9 +91,16 @@ def browseFiles(): #Open file browser, so user can chose image file
     text_f1.delete("1.0","end")
     with open(mdfile) as f: s = f.read()
     text_f1.insert(END, s)
+    mdfile_entered.set(mdfile)
+#
+def cancelFiles():
+    global mdfile
+    text_f1.delete("1.0","end")
+    with open(mdfile) as f: s = f.read()
+    text_f1.insert(END, s)
 #
 def insert():
-    text_f1.insert(END, f'![{filename}]({filename} \"{filename}\")\n')
+    text_f1.insert(INSERT, f'\n![{filename}]({filename} \"{filename}\")\n')
 #
 # THIS WORKS HERE, NO TOUCHY
 #
@@ -77,6 +114,8 @@ except:
     im = PhotoImage(file = "image_0.png")
 filename = "image_0.png"
 #
+mdfile = ""
+#
 #Making layout
 #
 pw1 = PanedWindow(width=1000, height=1000)
@@ -84,8 +123,9 @@ pw1.pack(fill="both", expand=True)
 #
 #add Markdown Frame to PanedWindow 1
 #
-f1 = Frame(pw1, width=500, height=500) # Make frame for MD
+f1 = Canvas(pw1, width=500, height=500) # Make frame for MD
 text_f1 = Text(f1, height=50, width=50, wrap="none", background="grey")
+text_f1.pack(expand=True, fill="both")
 pw1.add(f1)
 #
 #Second paned window to hold html and images
@@ -117,36 +157,49 @@ except:
 global draw
 draw = ImageDraw.Draw(image1)
 #
-f1.grid_rowconfigure(0, weight=1)
-f1.grid_columnconfigure(0, weight=1)
+#f1.grid_rowconfigure(0, weight=1)
+#f1.grid_columnconfigure(0, weight=1)
 f3.grid_rowconfigure(0, weight=1)
 f3.grid_columnconfigure(0, weight=1)
-text_f1.grid(row=0, column=0, sticky="nsew")
 #
-#Image bindings/Save button
+#Buttons and text boxes
 #
-#frame = Frame(f1)
-#frame.pack()
+frame_f1 = Frame(f1)
+frame_f1.pack()
 #
 btn_file = Button(f1, text="browseFiles", command=browseFiles)
-btn_file.grid()
+btn_file.pack(side="left")
 #
-frame = Frame(f2)
-frame.pack()
+btn_cancel_file = Button(f1, text="cancel", command=cancelFiles)
+btn_cancel_file.pack(side="left")
 #
-btn_insert = Button(frame, text="insert", command=insert)
+btn_save_file = Button(f1, text="save", command=save_file)
+btn_save_file.pack(side="left")
+#
+btn_save_html = Button(f1, text="saveHTML", command=save_html)
+btn_save_html.pack(side="right")
+#
+mdfile_entered = StringVar()
+mdfile_entered.set(mdfile)
+md_filename = Entry(frame_f1, width = 45, textvariable = mdfile_entered)
+md_filename.pack(side="bottom")
+#
+frame_f2 = Frame(f2)
+frame_f2.pack()
+#
+btn_insert = Button(frame_f2, text="insert", command=insert)
 btn_insert.pack(side="left")
 #
-btn_save = Button(frame, text="save", command=save)
-btn_save.pack(side="left")
+btn_save_img = Button(frame_f2, text="save", command=save)
+btn_save_img.pack(side="left")
 #
-btn_img = Button(frame, text="browseFiles", command=browseImages)
+btn_img = Button(frame_f2, text="browseFiles", command=browseImages)
 btn_img.pack(side="left")
 f2.bind('<B1-Motion>', activate_paint)
 #
 filename_entered = StringVar()
 filename_entered.set(filename)
-txt_filename = Entry(frame, width = 45, textvariable = filename_entered)
+txt_filename = Entry(frame_f2, width = 45, textvariable = filename_entered)
 txt_filename.pack(side="left")
 #
 #Bind click of markdown to html converter
