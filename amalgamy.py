@@ -80,7 +80,7 @@ def browseImages(): #Open file browser, so user can chose image file
     f2.itemconfig(image_id, image=im)
     filename_entered.set(filename)
 #
-def browseFiles(): #Open file browser, so user can chose image file
+def browseFiles(): #Open file browser, so user can chose md file
     global mdfile
     mdfile = filedialog.askopenfilename(
         initialdir = "~/bluenote",
@@ -100,7 +100,10 @@ def cancelFiles():
     text_f1.insert(END, s)
 #
 def insert():
-    text_f1.insert(INSERT, f'\n![{filename}]({filename} \"{filename}\")\n')
+    #text_f1.insert(INSERT, f'\n![{filename}]({filename} \"{filename}\")\n')
+    #<img src="myImage.png">
+    text_f1.insert(INSERT, f'\n#{filename}\n<img src="{filename}">\n')
+
 #
 # THIS WORKS HERE, NO TOUCHY
 #
