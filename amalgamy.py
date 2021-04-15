@@ -1,8 +1,7 @@
 from tkinter import *
 from tkinter import messagebox as mbox
 from tkinter import filedialog
-
-from markdown2 import Markdown
+import markdown
 from tkinterhtml import HtmlFrame
 import PIL
 from PIL import Image, ImageDraw, ImageTk
@@ -11,8 +10,8 @@ from PIL import Image, ImageDraw, ImageTk
 #
 def get_text(a): # get text from amrkdown, and convert to html, and set html content
     content = text_f1.get(1.0, "end-1c")
-    entry_content.set(markdowner.convert(content))
-    content = markdowner.convert(content)
+    entry_content.set(markdown.markdown(content))
+    content = markdown.markdown(content)
     #print(f'<html><body style=\"background-color:grey;\">{content}</html>')
     f3.set_content(f"<html><body style=\"background-color:grey;\">{content}</html>")
 #
@@ -41,8 +40,8 @@ def save_html():
     if mdfile_entered.get() != "":
         mdfile = f"{mdfile_entered.get()}.html"
     content = text_f1.get(1.0, "end-1c")
-    entry_content.set(markdowner.convert(content))
-    content = markdowner.convert(content)
+    #entry_content.set(markdown.markdown(content ) )
+    content = markdown.markdown(content )
     try:
         with open(mdfile,'r+') as myfile:
             myfile.seek(0)
@@ -151,7 +150,6 @@ pw2.add(f3)
 #
 #Setup
 #
-markdowner = Markdown()
 lastx, lasty = None, None
 try:
     image1 = PIL.Image.open("image_0.png")
