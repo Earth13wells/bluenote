@@ -37,13 +37,12 @@ def paint(e): #From sketch.py
     x, y = e.x, e.y
     if x > (lastx - 25) and x < (lastx + 25):
         if y > (lasty - 25) and y < (lasty + 25):
-            line_pensi = f2.create_line((lastx, lasty, x, y), width=1)
+            f2.create_line((lastx, lasty, x, y), width=1)
             #  --- PIL
             draw.line((lastx, lasty, x, y), fill='black', width=1)
     lastx, lasty = x, y
 
 def browseFiles():
-    f2.delete('line_pensi')
     global filename
     filename = filedialog.askopenfilename(
         initialdir = "~/bluenote",
@@ -64,7 +63,9 @@ root = Tk() #all
 try:
     bg = im = PhotoImage(file = f"image_0.png")
 except:
-    bg  = im = PIL.Image.new('RGB', (500, 480), 'grey')
+    bg = im = PIL.Image.new('RGB', (500, 480),'grey')
+    im.save("image_0.png")
+    bg = im = PhotoImage(file = "image_0.png")
 
 pw1 = PanedWindow(width=880, height=500)
 pw1.pack(fill="both", expand=True)
