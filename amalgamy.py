@@ -9,23 +9,18 @@ from PIL import Image, ImageDraw, ImageTk
 #
 #Functions
 #
-
-def get_text(a):
+def get_text(a): # get text from amrkdown, and convert to html, and set html content
     content = text_f1.get(1.0, "end-1c")
     entry_content.set(markdowner.convert(content))
     content = markdowner.convert(content)
     print(f'<html><body style=\"background-color:grey;\">{content}</html>')
     f3.set_content(f"<html><body style=\"background-color:grey;\">{content}</html>")
-
 #
-def save(): #From sketch.py
-    try:
-        image1.save(filename)
-    except:
-        global image_number
-        filenames = f'image_{image_number}.png'   # image_number increments by 1 at every save
-        image1.save(filenames)
-        image_number += 1
+def save(): #Save Image as filename
+    global filename
+    if filename_entered.get() != "":
+        filename = filename_entered.get()
+    image1.save(filename)
 #
 def activate_paint(e): #From sketch.py
     global lastx, lasty
@@ -42,7 +37,7 @@ def paint(e): #From sketch.py
             draw.line((lastx, lasty, x, y), fill='black', width=1)
     lastx, lasty = x, y
 
-def browseFiles():
+def browseFiles(): #Open file browser, so user can chose image file
     global filename
     filename = filedialog.askopenfilename(
         initialdir = "~/bluenote",
@@ -53,52 +48,59 @@ def browseFiles():
     global im
     im = PhotoImage(file = f"{filename}")
     f2.itemconfig(image_id, image=im)
+    filename_entered.set(filename)
 
 #
-#Making layout
+# THIS WORKS HERE, NO TOUCHY
 #
 root = Tk() #all
 
-
 try:
-    bg = im = PhotoImage(file = f"image_0.png")
+    im = PhotoImage(file = f"image_0.png")
 except:
-    bg = im = PIL.Image.new('RGB', (500, 480),'grey')
+    im = PIL.Image.new('RGB', (500, 480),'grey')
     im.save("image_0.png")
-    bg = im = PhotoImage(file = "image_0.png")
-
-pw1 = PanedWindow(width=880, height=500)
+    im = PhotoImage(file = "image_0.png")
+filename = "image_0.png"
+#
+#Making layout
+#
+pw1 = PanedWindow(width=1000, height=1000)
 pw1.pack(fill="both", expand=True)
 #
-f1 = Frame(pw1, width=500, height=500) # Make frame for text
+#add Markdown Frame to PanedWindow 1
+#
+f1 = Frame(pw1, width=500, height=500) # Make frame for MD
+text_f1 = Text(f1, height=50, width=50, wrap="none", background="grey")
 pw1.add(f1)
+#
+#Second paned window to hold html and images
 #
 pw2 = PanedWindow(pw1, orient=VERTICAL, height=500)
 pw1.add(pw2)
 #
-f2 = Canvas(pw2, width=100, height=500, background="grey") # make canvas for drawing
+#Add image editor to PanedWindow 2
+#
+f2 = Canvas(pw2, width=100, height=500, background="light grey") # make canvas for drawing
 f2.pack(side='top', expand='yes')
 image_id = f2.create_image( 0, 0, image = im, anchor = "nw")
 pw2.add(f2)
+#
+#add html window to PanedWindow 2
 #
 f3 = HtmlFrame(root, horizontal_scrollbar="auto", height=100, width=100)
 #f3.pack(side='top', fill='x', expand='no')
 pw2.add(f3)
 #
-#Making text box on left side panel
-#
-text_f1 = Text(f1, height=50, width=50, wrap="none", background="grey")
-#
 #Setup
 #
 markdowner = Markdown()
 lastx, lasty = None, None
-image_number = 0
 try:
     image1 = PIL.Image.open("image_0.png")
 except:
     image1 = PIL.Image.new('RGB', (500, 480), 'grey')
-
+global draw
 draw = ImageDraw.Draw(image1)
 #
 f1.grid_rowconfigure(0, weight=1)
@@ -109,11 +111,19 @@ text_f1.grid(row=0, column=0, sticky="nsew")
 #
 #Image bindings/Save button
 #
-btn_save = Button(f2, text="save", command=save)
-btn_save.pack(side="top")
-btn_file = Button(f2, text="browseFiles", command=browseFiles)
-btn_file.pack(side="top")
-f2.bind('<1>', activate_paint)
+frame = Frame(f2)
+frame.pack()
+#
+btn_save = Button(frame, text="save", command=save)
+btn_save.pack(side="left")
+btn_file = Button(frame, text="browseFiles", command=browseFiles)
+btn_file.pack(side="left")
+f2.bind('<B1-Motion>', activate_paint)
+
+filename_entered = StringVar()
+filename_entered.set(filename)
+nameEntered = Entry(frame, width = 45, textvariable = filename_entered)
+nameEntered.pack(side="left")
 #
 #Bind click of markdown to html converter
 #
