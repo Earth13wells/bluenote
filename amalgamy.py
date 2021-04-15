@@ -13,7 +13,7 @@ def get_text(a): # get text from amrkdown, and convert to html, and set html con
     content = text_f1.get(1.0, "end-1c")
     entry_content.set(markdowner.convert(content))
     content = markdowner.convert(content)
-    print(f'<html><body style=\"background-color:grey;\">{content}</html>')
+    #print(f'<html><body style=\"background-color:grey;\">{content}</html>')
     f3.set_content(f"<html><body style=\"background-color:grey;\">{content}</html>")
 #
 def save(): #Save Image as filename
@@ -36,20 +36,34 @@ def paint(e): #From sketch.py
             #  --- PIL
             draw.line((lastx, lasty, x, y), fill='black', width=1)
     lastx, lasty = x, y
-
-def browseFiles(): #Open file browser, so user can chose image file
+#
+def browseImages(): #Open file browser, so user can chose image file
     global filename
     filename = filedialog.askopenfilename(
         initialdir = "~/bluenote",
         title = "Select a File",
-        filetypes = (("imageFiles", "*.png*"),
+        filetypes = (("imageFiles", f"*.png*"),
                     ("allFiles", "*.*"))
         )
     global im
     im = PhotoImage(file = f"{filename}")
     f2.itemconfig(image_id, image=im)
     filename_entered.set(filename)
-
+#
+def browseFiles(): #Open file browser, so user can chose image file
+    global mdfile
+    mdfile = filedialog.askopenfilename(
+        initialdir = "~/bluenote",
+        title = "Select a File",
+        filetypes = (("markDownFiles", f"*.md*"),
+                    ("allFiles", "*.*"))
+        )
+    text_f1.delete("1.0","end")
+    with open(mdfile) as f: s = f.read()
+    text_f1.insert(END, s)
+#
+def insert():
+    text_f1.insert(END, f'![{filename}]({filename} \"{filename}\")\n')
 #
 # THIS WORKS HERE, NO TOUCHY
 #
@@ -111,19 +125,29 @@ text_f1.grid(row=0, column=0, sticky="nsew")
 #
 #Image bindings/Save button
 #
+#frame = Frame(f1)
+#frame.pack()
+#
+btn_file = Button(f1, text="browseFiles", command=browseFiles)
+btn_file.grid()
+#
 frame = Frame(f2)
 frame.pack()
 #
+btn_insert = Button(frame, text="insert", command=insert)
+btn_insert.pack(side="left")
+#
 btn_save = Button(frame, text="save", command=save)
 btn_save.pack(side="left")
-btn_file = Button(frame, text="browseFiles", command=browseFiles)
-btn_file.pack(side="left")
+#
+btn_img = Button(frame, text="browseFiles", command=browseImages)
+btn_img.pack(side="left")
 f2.bind('<B1-Motion>', activate_paint)
-
+#
 filename_entered = StringVar()
 filename_entered.set(filename)
-nameEntered = Entry(frame, width = 45, textvariable = filename_entered)
-nameEntered.pack(side="left")
+txt_filename = Entry(frame, width = 45, textvariable = filename_entered)
+txt_filename.pack(side="left")
 #
 #Bind click of markdown to html converter
 #
